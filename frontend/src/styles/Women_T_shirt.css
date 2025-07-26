@@ -343,8 +343,17 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   margin-top: 50px;
-  
-  
+}
+
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-link:hover {
+  text-decoration: none;
+  color: inherit;
 }
 
 .product-cards:hover {
@@ -364,7 +373,7 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
-  
+  cursor: pointer;
 }
 
 .product-cards:hover .product-images {

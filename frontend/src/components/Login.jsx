@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../services/api';
 import '../styles/Login.css';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    telephone: '',
+    email: '',
     password: ''
   });
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -15,12 +20,26 @@ const Login = () => {
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    // Add your login logic here
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await apiService.login(formData.email, formData.password);
+      console.log('Login successful:', response);
+      
+      // Redirect to homepage or dashboard
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -37,18 +56,32 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <form onSubmit={handleSubmit} className="login-form">
-          {/* Telephone Input */}
+          {/* Error Message */}
+          {error && (
+            <div className="error-message" style={{ 
+              color: '#ef4444', 
+              backgroundColor: '#fef2f2', 
+              border: '1px solid #fecaca', 
+              borderRadius: '4px', 
+              padding: '12px', 
+              marginBottom: '16px' 
+            }}>
+              {error}
+            </div>
+          )}
+
+          {/* Email Input */}
           <div className="input-group">
-            <label htmlFor="telephone" className="input-label">
-              Telephone <span className="required">*</span>
+            <label htmlFor="email" className="input-label">
+              Email <span className="required">*</span>
             </label>
             <input
-              type="tel"
-              id="telephone"
-              name="telephone"
-              value={formData.telephone}
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
               onChange={handleInputChange}
-              placeholder="Enter telephone"
+              placeholder="Enter your email"
               className="form-input"
               required
             />
@@ -81,8 +114,8 @@ const Login = () => {
           </div>
 
           {/* Login Button */}
-          <button type="submit" className="login-button">
-            LOGIN
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'LOGGING IN...' : 'LOGIN'}
           </button>
 
           {/* Forgot Password Link */}

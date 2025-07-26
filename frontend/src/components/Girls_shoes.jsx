@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Heart, Bell, ShoppingBag } from 'lucide-react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import '../styles/Women_T_shirt.css';
 import Footer from '../components/Footer';
 
@@ -104,6 +104,7 @@ const categories = [
 
 
 const Girls_shoes = () => {
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState(new Set());
   const [openDropdown, setOpenDropdown] = useState(null);
 
@@ -115,6 +116,11 @@ const Girls_shoes = () => {
       newFavorites.add(productId);
     }
     setFavorites(newFavorites);
+  };
+
+  const handleProductClick = (product) => {
+    // Navigate to payment page with product information
+    navigate('/payment', { state: { product } });
   };
 
   return (
@@ -203,7 +209,13 @@ const Girls_shoes = () => {
                 >
                   <Heart size={16} fill={favorites.has(product.id) ? '#ef4444' : 'none'} />
                 </button>
-                <img src={product.image} alt={product.name} className="product-images" />
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="product-images"
+                  onClick={() => handleProductClick(product)}
+                  style={{ cursor: 'pointer' }}
+                />
               </div>
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>

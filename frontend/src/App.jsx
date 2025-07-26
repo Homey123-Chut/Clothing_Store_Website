@@ -5,6 +5,11 @@ import Collection from "./components/Collection";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Footer from "./components/Footer";
+import ProductDetail from "./components/ProductDetail";
+import TestPaymentNew from "./components/TestPaymentNew";
+import CategoryProducts from "./components/CategoryProducts";
+
+import PaymentPage from "./components/PaymentPage";
 import Women_T_shirt from "./components/Women_T_shirt";
 import Women_shirt from './components/Women_shirt';
 import Women_jacket from './components/Women_jacket';
@@ -37,8 +42,26 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<><HomePage /><Collection /> <Footer /> </>} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/test-payment" element={<TestPaymentNew />} />
+
+        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment/:id" element={<PaymentPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register/>} />
+        
+        {/* Women's Category Routes */}
+        <Route path="/women/t-shirt" element={<CategoryProducts />} />
+        <Route path="/women/shirt" element={<CategoryProducts />} />
+        <Route path="/women/jacket" element={<CategoryProducts />} />
+        <Route path="/women/shoes" element={<CategoryProducts />} />
+        <Route path="/women/skirt" element={<CategoryProducts />} />
+        <Route path="/women/shorts" element={<CategoryProducts />} />
+        <Route path="/women/jeans" element={<CategoryProducts />} />
+        <Route path="/women/trouser" element={<CategoryProducts />} />
+        <Route path="/women/dress" element={<CategoryProducts />} />
+        
+        {/* Legacy women's routes (keeping for backward compatibility) */}
         <Route path= "/t-shirt" element={<Women_T_shirt/>} />
         <Route path= "/shirt" element={<Women_shirt/>} />
         <Route path= "/jacket" element={<Women_jacket/>} />
@@ -68,6 +91,9 @@ function App() {
         <Route path= "/accessories/hat" element={<Accessories_hat/>} />
         <Route path= "/accessories/bag" element={<Accessories_bag/>} />
         <Route path= "/accessories/wallet" element={<Accessories_wallet/>} />
+
+        {/* Catch-all route for any category/subcategory combination */}
+        <Route path="/:category/:subcategory" element={<CategoryProducts />} />
 
 
 

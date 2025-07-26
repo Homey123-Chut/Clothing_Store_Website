@@ -1,22 +1,23 @@
-import React, { useState } from "react";
-import { Bell, Heart, ShoppingBag } from "lucide-react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Bell, Heart, ShoppingBag, User, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/Homepage.css";
-import bannerImg from '../assets/10.jpg'
+import bannerImg from '../assets/10.jpg';
+import apiService from '../services/api';
 
-const categories = [
+const staticCategories = [
   {
     name: "Women",
     items: [
-      { name: "T-shirt", link: "/t-shirt" },
-      { name: "Shirt", link: "/shirt" },
-      { name: "Jacket", link: "/jacket" },
-      { name: "Skirt", link: "/skirt" },
-      { name: "Shorts", link: "/shorts" },
-      { name: "Jeans", link: "/jeans" },
-      { name: "Trouser", link: "/trouser" },
-      { name: "Dress", link: "/dress" },
-      { name: "Shoes", link: "/shoes"},
+      { name: "T-shirt", link: "/women/t-shirt" },
+      { name: "Shirt", link: "/women/shirt" },
+      { name: "Jacket", link: "/women/jacket" },
+      { name: "Skirt", link: "/women/skirt" },
+      { name: "Shorts", link: "/women/shorts" },
+      { name: "Jeans", link: "/women/jeans" },
+      { name: "Trouser", link: "/women/trouser" },
+      { name: "Dress", link: "/women/dress" },
+      { name: "Shoes", link: "/women/shoes"},
     ],
   },
   {
@@ -61,6 +62,73 @@ const categories = [
 
 function Homepage() {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [categories, setCategories] = useState(staticCategories); // Initialize with static categories
+  const [_loading, setLoading] = useState(true); // Prefix with underscore to avoid unused warning
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  // Check if user is logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    apiService.logout();
+    setUser(null);
+    navigate('/');
+  };
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getCategories();
+
+        // Transform API response to match the expected format
+        const transformedCategories = response.map(category => ({
+          name: category.name,
+          items: category.subcategories?.map(sub => ({
+            name: sub.name.replace(`${category.name} `, ''), // Remove parent name prefix
+            link: `/${sub.slug.replace(`${category.slug}-`, '')}`
+          })) || []
+        }));
+
+        // Sort categories to ensure Women comes first, then the rest
+        const sortedCategories = transformedCategories.sort((a, b) => {
+          if (a.name === 'Women') return -1;
+          if (b.name === 'Women') return 1;
+          if (a.name === 'Men') return -1;
+          if (b.name === 'Men') return 1;
+          if (a.name === 'Girls') return -1;
+          if (b.name === 'Girls') return 1;
+          if (a.name === 'Boys') return -1;
+          if (b.name === 'Boys') return 1;
+          return 0; // Accessories and others stay at the end
+        });
+
+        setCategories(sortedCategories);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        // Keep using static categories if API fails (already initialized)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <div className="homepage-container">
@@ -91,8 +159,41 @@ function Homepage() {
                 <ShoppingBag size={22} className="text-black" />
                 <span className="shopping-bag-badge">0</span>
               </div>
-              <Link to="/login" className="login-link">LOGIN</Link>
-              <Link to="/register" className="register-link">REGISTER</Link>
+              
+              {/* User Authentication Section */}
+              {user ? (
+                <div className="user-section" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <User size={20} className="text-black" />
+                    <span style={{ color: '#000', fontSize: '14px' }}>
+                      Hi, {user.name}
+                    </span>
+                  </div>
+                  <button 
+                    onClick={handleLogout}
+                    className="logout-btn"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      color: '#ef4444'
+                    }}
+                  >
+                    <LogOut size={16} />
+                    <span style={{ fontSize: '12px' }}>Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" className="login-link">LOGIN</Link>
+                  <Link to="/register" className="register-link">REGISTER</Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -117,13 +218,13 @@ function Homepage() {
                 {cat.name}
               </button>
             ) : (
-              <a
-                href={cat.link}
+              <Link
+                to={cat.link || '#'}
                 className="category-btn"
                 style={{ fontWeight: 700, textDecoration: "none", display: "inline-block" }}
               >
                 {cat.name}
-              </a>
+              </Link>
             )}
             {/* Dropdown for categories with items */}
             {cat.items && (
@@ -131,7 +232,7 @@ function Homepage() {
                 <ul>
                   {cat.items.map((item) => (
                     <li key={item.name}>
-                      <a href={item.link}>{item.name}</a>
+                      <Link to={item.link}>{item.name}</Link>
                     </li>
                   ))}
                 </ul>

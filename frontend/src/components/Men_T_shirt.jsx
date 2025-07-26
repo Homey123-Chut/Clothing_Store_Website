@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Heart, Bell, ShoppingBag } from 'lucide-react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import '../styles/Women_T_shirt.css';
 import Footer from '../components/Footer';
 
@@ -115,6 +115,7 @@ const categories = [
 
 
 const Men_T_shirt = () => {
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState(new Set());
   const [openDropdown, setOpenDropdown] = useState(null);
 
@@ -126,6 +127,14 @@ const Men_T_shirt = () => {
       newFavorites.add(productId);
     }
     setFavorites(newFavorites);
+  };
+
+  const handleProductClick = (product) => {
+    // Method 1: Navigate to payment page with product information (current method)
+    navigate('/payment', { state: { product } });
+    
+    // Method 2: Navigate with URL parameter (alternative method - uncomment to use)
+    // navigate(`/payment/${product.id}`, { state: { product } });
   };
 
   return (
@@ -214,7 +223,24 @@ const Men_T_shirt = () => {
                 >
                   <Heart size={16} fill={favorites.has(product.id) ? '#ef4444' : 'none'} />
                 </button>
-                <img src={product.image} alt={product.name} className="product-images" />
+                
+                {/* Current method: Using onClick handler */}
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="product-images"
+                  onClick={() => handleProductClick(product)}
+                  style={{ cursor: 'pointer' }}
+                />
+                
+                {/* Alternative method: Using Link (uncomment to use) */}
+                {/* <Link to={`/payment/${product.id}`} state={{ product }}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="product-images"
+                  />
+                </Link> */}
               </div>
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>

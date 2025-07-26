@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import "../styles/Collection.css";
 
 
@@ -124,26 +124,26 @@ const Collections = [
   {
     title: "Women's collection",
     products: [
-      { id: 1, name: "Women's Basic Tee", color: "White", price: 19.99, originalPrice: 29.99, image: women1, onSale: true },
-      { id: 2, name: "Women's Pink Shirt", color: "Pink", price: 21.99, originalPrice: 31.99, image: women2, onSale: true },
-      { id: 3, name: "Women's Cream Blouse", color: "Cream", price: 23.99, originalPrice: 33.99, image: women3, onSale: true },
-      { id: 4, name: "Women's Navy Top", color: "Navy", price: 25.99, originalPrice: 35.99, image: women4, onSale: true },
-      { id: 5, name: "Women's Summer Dress", color: "Yellow", price: 27.99, originalPrice: 37.99, image: women5, onSale: true },
-      { id: 6, name: "Women's Floral Skirt", color: "Floral", price: 29.99, originalPrice: 39.99, image: women6, onSale: true },
-      { id: 7, name: "Women's Black Jeans", color: "Black", price: 31.99, originalPrice: 41.99, image: women7, onSale: true },
-      { id: 8, name: "Women's White Blazer", color: "White", price: 33.99, originalPrice: 43.99, image: women8, onSale: true },
-      { id: 9, name: "Women's Red Sweater", color: "Red", price: 35.99, originalPrice: 45.99, image: women9, onSale: true },
-      { id: 10, name: "Women's Blue Jacket", color: "Blue", price: 37.99, originalPrice: 47.99, image: women10, onSale: true },
-      { id: 11, name: "Women's Green Cardigan", color: "Green", price: 39.99, originalPrice: 49.99, image: women11, onSale: true },
-      { id: 12, name: "Women's Yellow Top", color: "Yellow", price: 41.99, originalPrice: 51.99, image: women12, onSale: true },
-      { id: 13, name: "Women's Purple Dress", color: "Purple", price: 43.99, originalPrice: 53.99, image: women13, onSale: true },
-      { id: 14, name: "Women's Orange Skirt", color: "Orange", price: 45.99, originalPrice: 55.99, image: women14, onSale: true },
-      { id: 15, name: "Women's Grey Pants", color: "Grey", price: 47.99, originalPrice: 57.99, image: women15, onSale: true },
-      { id: 16, name: "Women's Brown Coat", color: "Brown", price: 49.99, originalPrice: 59.99, image: women16, onSale: true },
-      { id: 17, name: "Women's Pink Blouse", color: "Pink", price: 51.99, originalPrice: 61.99, image: women17, onSale: true },
-      { id: 18, name: "Women's Navy Jeans", color: "Navy", price: 53.99, originalPrice: 63.99, image: women18, onSale: true },
-      { id: 19, name: "Women's White Tee", color: "White", price: 55.99, originalPrice: 65.99, image: women19, onSale: true },
-      { id: 20, name: "Women's Black Dress", color: "Black", price: 57.99, originalPrice: 67.99, image: women20, onSale: true },
+      { id: 1, name: "Women's Basic Tee", color: "White", price: 19.99, originalPrice: 29.99, image: women1, onSale: true, colors: ["white", "pink", "blue"], sizes: ["XS", "S", "M", "L", "XL"] },
+      { id: 2, name: "Women's Pink Shirt", color: "Pink", price: 21.99, originalPrice: 31.99, image: women2, onSale: true, colors: ["pink", "white"], sizes: ["S", "M", "L", "XL"] },
+      { id: 3, name: "Women's Cream Blouse", color: "Cream", price: 23.99, originalPrice: 33.99, image: women3, onSale: true, colors: ["cream", "white"], sizes: ["XS", "S", "M", "L"] },
+      { id: 4, name: "Women's Navy Top", color: "Navy", price: 25.99, originalPrice: 35.99, image: women4, onSale: true, colors: ["navy", "black"], sizes: ["S", "M", "L", "XL"] },
+      { id: 5, name: "Women's Summer Dress", color: "Yellow", price: 27.99, originalPrice: 37.99, image: women5, onSale: true, colors: ["yellow", "orange"], sizes: ["XS", "S", "M", "L", "XL"] },
+      { id: 6, name: "Women's Floral Skirt", color: "Floral", price: 29.99, originalPrice: 39.99, image: women6, onSale: true, colors: ["floral", "white"], sizes: ["XS", "S", "M", "L"] },
+      { id: 7, name: "Women's Black Jeans", color: "Black", price: 31.99, originalPrice: 41.99, image: women7, onSale: true, colors: ["black", "blue"], sizes: ["26", "28", "30", "32", "34"] },
+      { id: 8, name: "Women's White Blazer", color: "White", price: 33.99, originalPrice: 43.99, image: women8, onSale: true, colors: ["white", "cream"], sizes: ["XS", "S", "M", "L", "XL"] },
+      { id: 9, name: "Women's Red Sweater", color: "Red", price: 35.99, originalPrice: 45.99, image: women9, onSale: true, colors: ["red", "burgundy"], sizes: ["S", "M", "L", "XL"] },
+      { id: 10, name: "Women's Blue Jacket", color: "Blue", price: 37.99, originalPrice: 47.99, image: women10, onSale: true, colors: ["blue", "navy"], sizes: ["XS", "S", "M", "L", "XL"] },
+      { id: 11, name: "Women's Green Cardigan", color: "Green", price: 39.99, originalPrice: 49.99, image: women11, onSale: true, colors: ["green", "olive"], sizes: ["S", "M", "L", "XL"] },
+      { id: 12, name: "Women's Yellow Top", color: "Yellow", price: 41.99, originalPrice: 51.99, image: women12, onSale: true, colors: ["yellow", "gold"], sizes: ["XS", "S", "M", "L"] },
+      { id: 13, name: "Women's Purple Dress", color: "Purple", price: 43.99, originalPrice: 53.99, image: women13, onSale: true, colors: ["purple", "lavender"], sizes: ["XS", "S", "M", "L", "XL"] },
+      { id: 14, name: "Women's Orange Skirt", color: "Orange", price: 45.99, originalPrice: 55.99, image: women14, onSale: true, colors: ["orange", "coral"], sizes: ["XS", "S", "M", "L"] },
+      { id: 15, name: "Women's Grey Pants", color: "Grey", price: 47.99, originalPrice: 57.99, image: women15, onSale: true, colors: ["grey", "charcoal"], sizes: ["26", "28", "30", "32", "34"] },
+      { id: 16, name: "Women's Brown Coat", color: "Brown", price: 49.99, originalPrice: 59.99, image: women16, onSale: true, colors: ["brown", "tan"], sizes: ["XS", "S", "M", "L", "XL"] },
+      { id: 17, name: "Women's Pink Blouse", color: "Pink", price: 51.99, originalPrice: 61.99, image: women17, onSale: true, colors: ["pink", "rose"], sizes: ["S", "M", "L", "XL"] },
+      { id: 18, name: "Women's Navy Jeans", color: "Navy", price: 53.99, originalPrice: 63.99, image: women18, onSale: true, colors: ["navy", "indigo"], sizes: ["26", "28", "30", "32", "34"] },
+      { id: 19, name: "Women's White Tee", color: "White", price: 55.99, originalPrice: 65.99, image: women19, onSale: true, colors: ["white", "off-white"], sizes: ["XS", "S", "M", "L", "XL"] },
+      { id: 20, name: "Women's Black Dress", color: "Black", price: 57.99, originalPrice: 67.99, image: women20, onSale: true, colors: ["black", "charcoal"], sizes: ["XS", "S", "M", "L", "XL"] },
     ]
   },
   {
@@ -261,48 +261,206 @@ const Collections = [
 
 ];
 
+// Lazy loading image component
+const LazyImage = memo(({ src, alt, className, onLoad }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const [imgRef, setImgRef] = useState(null);
+
+  useEffect(() => {
+    if (!imgRef) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '50px' }
+    );
+
+    observer.observe(imgRef);
+    return () => observer.disconnect();
+  }, [imgRef]);
+
+  const handleImageLoad = useCallback(() => {
+    setIsLoaded(true);
+    onLoad?.();
+  }, [onLoad]);
+
+  return (
+    <div ref={setImgRef} className={`lazy-image-container ${className}`}>
+      {isInView && (
+        <>
+          <img
+            src={src}
+            alt={alt}
+            className={`product-image ${isLoaded ? 'loaded' : 'loading'}`}
+            onLoad={handleImageLoad}
+            loading="lazy"
+          />
+          {!isLoaded && (
+            <div className="image-placeholder">
+              <div className="loading-spinner"></div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+});
+
+// Memoized product card component
+const ProductCard = memo(({ product, onProductClick }) => {
+  const handleClick = useCallback(() => {
+    onProductClick(product);
+  }, [product, onProductClick]);
+
+  // Alternative: Use Link for navigation (comment out current div and uncomment Link version)
+  // return (
+  //   <Link 
+  //     to={`/payment/${product.id}`} 
+  //     state={{ product }}
+  //     className="product-card-horizontal"
+  //   >
+  //     <div className="product-image-container">
+  //       {product.onSale && <div className="sale-badge">SALE</div>}
+  //       <LazyImage
+  //         src={product.image}
+  //         alt={product.name}
+  //         className="product-image"
+  //       />
+  //     </div>
+  //     <div className="product-info">
+  //       <h3 className="product-name">{product.name}</h3>
+  //       <div className="product-pricing">
+  //         <span className="current-price">${product.price.toFixed(2)}</span>
+  //         {product.originalPrice && (
+  //           <span className="original-price">
+  //             ${product.originalPrice.toFixed(2)}
+  //           </span>
+  //         )}
+  //       </div>
+  //     </div>
+  //   </Link>
+  // );
+
+  return (
+    <div
+      className="product-card-horizontal"
+      onClick={handleClick}
+    >
+      <div className="product-image-container">
+        {product.onSale && <div className="sale-badge">SALE</div>}
+        <LazyImage
+          src={product.image}
+          alt={product.name}
+          className="product-image"
+        />
+      </div>
+      <div className="product-info">
+        <h3 className="product-name">{product.name}</h3>
+        <div className="product-pricing">
+          <span className="current-price">${product.price.toFixed(2)}</span>
+          {product.originalPrice && (
+            <span className="original-price">
+              ${product.originalPrice.toFixed(2)}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// Memoized collection section component
+const CollectionSection = memo(({ collection, onProductClick }) => {
+  const [visibleProducts, setVisibleProducts] = useState(8); // Show 8 products initially
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleShowMore = useCallback(() => {
+    setVisibleProducts(prev => Math.min(prev + 8, collection.products.length));
+    setIsExpanded(visibleProducts + 8 >= collection.products.length);
+  }, [visibleProducts, collection.products.length]);
+
+  const handleShowLess = useCallback(() => {
+    setVisibleProducts(8);
+    setIsExpanded(false);
+  }, []);
+
+  return (
+    <div className="collection-section">
+      <h2 className="collection-title">{collection.title}</h2>
+      <div className="products-horizontal-scroll">
+        <div className="products-horizontal-grid">
+          {collection.products.slice(0, visibleProducts).map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onProductClick={onProductClick}
+            />
+          ))}
+        </div>
+        {collection.products.length > 8 && (
+          <div className="load-more-container">
+            {!isExpanded ? (
+              <button
+                className="load-more-btn"
+                onClick={handleShowMore}
+                disabled={visibleProducts >= collection.products.length}
+              >
+                Show More ({collection.products.length - visibleProducts} remaining)
+              </button>
+            ) : (
+              <button className="load-more-btn" onClick={handleShowLess}>
+                Show Less
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
 const Collection = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
-  };
+  useEffect(() => {
+    // Simulate initial loading delay
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleProductClick = useCallback((product) => {
+    // Navigate to full payment page with product information
+    navigate('/payment', { state: { product } });
+  }, [navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="collections-container">
+        <div className="collections-loading">
+          <div className="loading-spinner-large"></div>
+          <p>Loading collections...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="collections-container">
-      {Collections.map((Collection, collectionIndex) => (
-        <div key={collectionIndex} className="collection-section">
-          <h2 className="collection-title">{Collection.title}</h2>
-          <div className="products-grid">
-            {Collection.products.map((product) => (
-              <div
-                key={product.id}
-                className="product-card"
-                onClick={() => handleProductClick(product.id)}
-              >
-                <div className="product-image-container">
-                  {product.onSale && <div className="sale-badge">SALE</div>}
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="product-image"
-                  />
-                </div>
-                <div className="product-info">
-                  <h3 className="product-name">{product.name}</h3>
-                  <div className="product-pricing">
-                    <span className="current-price">${product.price.toFixed(2)}</span>
-                    {product.originalPrice && (
-                      <span className="original-price">
-                        ${product.originalPrice.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {Collections.map((collection, collectionIndex) => (
+        <CollectionSection
+          key={`${collection.title}-${collectionIndex}`}
+          collection={collection}
+          onProductClick={handleProductClick}
+        />
       ))}
     </div>
   );
